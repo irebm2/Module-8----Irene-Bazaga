@@ -127,8 +127,8 @@ $(document).ready(function() {
         forecastContainer.append(currentWeatherCardTitle);
         forecastContainer.append(currentWeatherCard);
         
-        const forecastContainerTitle = $('<h3> Forecast for the next 5 days in ' + currentCity'</h3>')
-
+        const forecastContainerTitle = $('<h3> Forecast for the next 5 days in ' + currentCity +'</h3>')
+        forecastContainer.append(forecastContainerTitle);
         const forecastDays = data.list.filter(day => {
           const time = day.dt_txt.split(' ')[1];
           return time === '12:00:00';
@@ -153,6 +153,13 @@ $(document).ready(function() {
           `);
       
           forecastContainer.append(forecastCard);
+        });
+        
+        $('#history').on('click', '.history-button', function() { 
+            // 'this' keyword refers to the current element that's clicked
+            let city = $(this).data('city');
+        
+            fetchWeatherData(city);
         });
       }
   });
