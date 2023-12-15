@@ -1,8 +1,7 @@
-$(document).ready(function () {
-    // Attach the form submission handler to the search form
+$(document).ready(function() {
     $('#search-form').on('submit', handleFormSubmit);
   
-    let history = []; // Create an array to store the city history
+    let history = [];
   
     function fetchWeatherData(city) {
       const apikey = '1182b819fb971825022b5fab780f5857';
@@ -12,9 +11,12 @@ $(document).ready(function () {
         .then(response => response.json())
         .then(data => {
           console.log(data);
-          // Call functions to process and display the data on the page
+          processWeatherData(data);
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+          console.error('Error:', error);
+          displayErrorMessage(error);
+        });
     }
   
     function handleFormSubmit(event) {
@@ -22,68 +24,90 @@ $(document).ready(function () {
   
       const city = $('#search-input').val();
   
-      // Save the city name to a variable before checking the history array
-      const storedCity = city;
+      if (city.trim() !== '') {
+        const storedCity = capitalizeFirstLetter(city);
   
-      // Remove any existing buttons with the same city name
-      $('.history-button').each(function () {
-        if ($(this).text() === storedCity) {
-          $(this).remove();
+        $('.history-button').filter(function() {
+          return $(this).data('city') === storedCity;
+        }).remove();
+  
+        if (!history.includes(storedCity)) {
+          createHistoryButton(storedCity);
+        } else {
+          console.log(`Skipping creating a history button for ${storedCity}, since it is already in the history.`);
         }
-      });
   
-      // Check if the city is already in history
-      if (!history.includes(storedCity)) {
-        // Create the history button
-        createHistoryButton(storedCity);
-      } else {
-        console.log('Skipping creating a history button for ' + storedCity + ', since it is already in the history.');
+        fetchWeatherData(storedCity);
+  
+        $('#search-input').val('');
       }
-  
-      // Optional: Reset the input value after submission
-      $('#search-input').val('');
     }
   
     function createHistoryButton(city) {
-      const capitalizedCity = capitalizeFirstLetter(city);
+      const button = $('<button type="button"></button>');
+      button.text(city);
+      button.addClass('history-button');
+      button.data('city', city);
   
-      // Check if the city is in the history array
-      if (!history.includes(capitalizedCity)) {
-        // Create the button and add it to the history list
-        const button = $('<button type="button"></button>');
-        button.text(capitalizedCity);
-        button.addClass('history-button');
-        button.data('city', capitalizedCity);
+      const historyList = $('#history');
+      historyList.append(button);
   
-        const historyList = $('#history');
-        historyList.append(button);
-  
-        // Add the city to the history array
-        history.push(capitalizedCity);
-      }
+      history.push(city);
     }
   
-    // Helper function to capitalize the first letter of a string
     function capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+  
+    function displayErrorMessage(error) {
+      $('#error-message').text(`An error occurred: ${error}`);
     }
   
     const removeButton = $('<button class="remove-button btn"> Clear history </button>');
     const inputGroup = $('.input-group');
     inputGroup.append(removeButton);
   
-    removeButton.on('click', function () {
-      // Remove all child elements with the class "history-button" from the "history" container
+    removeButton.on('click', function() {
       $('.history-button').remove();
-  
-      // Clear the history array
       history = [];
-  
-      // Optional: Create a history button for the previously searched city, even if it was listed before
-      createHistoryButton(storedCity);
+      $('.city-name').remove();
+      $('#forecast').empty();
     });
   
-    const searchBar = $('#search-input');
-    const cityName = $('<h2 class="city-name">' + capitalizedCity + '</h2>');
-    searchBar.closest('.input-group').append(cityName);
+    function displayWeatherData(data) {
+      $('.city-name').text(data.city.name);
+      const forecastContainer = $('#forecast');
+      forecastContainer.empty();
+  
+      // Display the current weather in a big card
+      const currentWeather = data.list[0];
+      const currentTemperature = (currentWeather.main.temp - 273.15).toFixed(2);
+      const currentWeatherDesc = currentWeather.weather[0].description;
+  
+      const currentWeatherCard = $('<div class="weather-card"></div>');
+      currentWeatherCard.html(`<h3>Current Weather</h3><p>Temperature: ${currentTemperature}°C</p><p>Weather: ${currentWeatherDesc}</p>`);
+  
+      forecastContainer.append(currentWeatherCard);
+  
+      // Filter and display the forecast for the following 5 days at midday
+      const forecastDays = data.list.filter(day => {
+        const time = day.dt_txt.split(' ')[1];
+        return time === '12:00:00';
+      }).slice(0, 5);
+  
+      forecastDays.forEach(day => {
+        const date = day.dt_txt.split(' ')[0];
+        const temperature = (day.main.temp - 273.15).toFixed(2);
+        const weatherDesc = day.weather[0].description;
+  
+        const forecastCard = $('<div class="weather-card"></div>');
+        forecastCard.html(`<h3>Forecast for ${date}</h3><p>Temperature: ${temperature}°C</p><p>Weather: ${weatherDesc}</p>`);
+  
+        forecastContainer.append(forecastCard);
+      });
+    }
+  
+    function processWeatherData(data) {
+      displayWeatherData(data);
+    }
   });
