@@ -1,76 +1,70 @@
 $(document).ready(function() {
     let history = [];
-  
+
     function fetchWeatherData(city) {
-      const apikey = '1182b819fb971825022b5fab780f5857';
-      const queryURL = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)},uk&appid=${apikey}`;
-  
-      fetch(queryURL)
-        .then(response => response.json())
-        .then(data => processWeatherData(data))
-        .catch(error => displayErrorMessage(error));
+        const apikey = '1182b819fb971825022b5fab780f5857';
+        const queryURL = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)},uk&appid=${apikey}`;
+
+        fetch(queryURL)
+            .then(response => response.json())
+            .then(data => processWeatherData(data))
+            .catch(error => displayErrorMessage(error));
     }
-  
+
     function handleFormSubmit(event) {
-      event.preventDefault();
-      const city = $('#search-input').val().trim();
-  
-      if (city !== '') {
-        const storedCity = capitalizeFirstLetter(city);
-  
-        $('.history-button').filter(function() {
-          return $(this).data('city') === storedCity;
-        }).remove();
-  
-        if (!history.includes(storedCity) && !$('#search-form button[data-city="' + city + '"]').length) {
-          createHistoryButton(storedCity);
+        event.preventDefault();
+        const city = $('#search-input').val().trim();
+
+        if (city !== '') {
+            const storedCity = capitalizeFirstLetter(city);
+        
+            if (!history.includes(storedCity)) { // If city not present in history
+                createHistoryButton(storedCity); // Create button
+            }
+
+            fetchWeatherData(storedCity);
+            $('#search-input').val('');
         }
-  
-        fetchWeatherData(storedCity);
-        $('#search-input').val('');
-      }
     }
-  
+
     function createHistoryButton(city) {
-      const button = $('<button type="button">' + city + '</button>');
-      button.addClass('history-button');
-      button.data('city', city);
-  
-      const historyList = $('#history');
-      historyList.append(button);
-  
-      history.push(city);
+        const button = $('<button type="button">' + city + '</button>');
+        button.addClass('history-button');
+        button.data('city', city);
+
+        const historyList = $('#history');
+        historyList.append(button);
+
+        history.push(city);
     }
-  
+
     function capitalizeFirstLetter(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
+        return string.charAt(0).toUpperCase() + string.slice(1);
     }
-  
+
     function displayErrorMessage(error) {
-      $('#error-message').text(`An error occurred: ${error}`);
+        $('#error-message').text(`An error occurred: ${error}`);
     }
-  
+
     function processWeatherData(data) {
-      displayWeatherData(data);
+        displayWeatherData(data);
     }
-  
-    // Create buttons
+
     const searchButton = $('<button type="submit" class="search-button btn">Search</button>');
     const clearButton = $('<button class="clear-button btn">Clear History</button>');
-  
-    // Append buttons to form
+
     $('#search-form').append(searchButton, clearButton);
-  
-    // Attach event listeners
+
     $('#search-form').on('submit', handleFormSubmit);
     clearButton.on('click', function() {
-      $('.history-button').remove();
-      history = [];
-  
-      // Remove the forecast data
-      const forecastContainer = $('#forecast');
-      forecastContainer.empty();
+        $('.history-button').remove();
+        history = [];
+
+        const forecastContainer = $('#forecast');
+        forecastContainer.empty();
     });
+
+    
 
     function handleFormSubmit(event) {
         event.preventDefault();
@@ -133,6 +127,8 @@ $(document).ready(function() {
         forecastContainer.append(currentWeatherCardTitle);
         forecastContainer.append(currentWeatherCard);
         
+        const forecastContainerTitle = $('<h3> Forecast for the next 5 days in ' + currentCity'</h3>')
+
         const forecastDays = data.list.filter(day => {
           const time = day.dt_txt.split(' ')[1];
           return time === '12:00:00';
