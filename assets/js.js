@@ -63,11 +63,38 @@ $(document).ready(function() {
       $('#error-message').text(`An error occurred: ${error}`);
     }
   
-    const removeButton = $('<button class="remove-button btn"> Clear history </button>');
+    const buttonContainer = $('<div class="button-container"></div>');
+    const searchButton = $('<button class="search-button btn">Search</button>');
+    const clearButton = $('<button class="clear-button btn">Clear History</button>');
     const inputGroup = $('.input-group');
-    inputGroup.append(removeButton);
   
-    removeButton.on('click', function() {
+    buttonContainer.append(searchButton);
+    buttonContainer.append(clearButton);
+    inputGroup.append(buttonContainer);
+  
+    searchButton.on('click', function () {
+      const city = $('#search-input').val();
+  
+      if (city.trim() !== '') {
+        const storedCity = capitalizeFirstLetter(city);
+  
+        $('.history-button').filter(function () {
+          return $(this).data('city') === storedCity;
+        }).remove();
+  
+        if (!history.includes(storedCity)) {
+          createHistoryButton(storedCity);
+        } else {
+          console.log(`Skipping creating a history button for ${storedCity}, since it is already in the history.`);
+        }
+  
+        fetchWeatherData(storedCity);
+  
+        $('#search-input').val('');
+      }
+    });
+  
+    clearButton.on('click', function () {
       $('.history-button').remove();
       history = [];
       $('.city-name').remove();
