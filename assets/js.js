@@ -6,7 +6,7 @@ $(document).ready(function() {
   
     function fetchWeatherData(city) {
       var apikey = '1182b819fb971825022b5fab780f5857';
-      var queryURL = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)}&appid=${apikey}`;
+      var queryURL = `https://api.openweathermap.org/data/2.5/forecast?q=${encodeURIComponent(city)},uk&appid=${apikey}`;
   
       fetch(queryURL)
         .then(response => response.json())
@@ -24,7 +24,7 @@ $(document).ready(function() {
       fetchWeatherData(city);
   
       createHistoryButton(city);
-      
+  
       // Optional: Reset the input value after submission
       $('#search-input').val('');
     }
@@ -46,7 +46,20 @@ $(document).ready(function() {
     }
   
     // Helper function to capitalize the first letter of a string
-    function capitalizeFirstLetter(string) {
+  
+    
+  function
+   
+  capitalizeFirstLetter(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
     }
+  
+    var removeButton = $('<button class="remove-button btn"> Clear history </button>');
+    var InputGroup = $('.input-group-append');
+    InputGroup.append(removeButton);
+  
+    removeButton.on('click', function() {
+      // Remove all child elements with the class "history-button" from the "history" container
+      $('#history').children('.history-button').remove();
+    });
   });
