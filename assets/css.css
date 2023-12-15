@@ -1,0 +1,46 @@
+.container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .weather-header {
+    width: 100%;
+  }
+  
+  .row {
+    width: 100%;
+  }
+  
+  aside {
+    flex: 0 0 20%;
+    padding-bottom: 1.5rem;
+  }
+  
+  .col-lg-9 {
+    flex: 0 0 80%;
+    padding-bottom: 1.5rem;
+  }
+  
+  #search-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .input-group {
+    width: 75%;
+  }
+  
+  .search-button {
+    margin-left: 0.5rem;
+  }
+  
+  #history {
+    margin-top: 1rem;
+  }
+  
+  #today,
+  #forecast {
+    margin-top: 1rem;
+  }
