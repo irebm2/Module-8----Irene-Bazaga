@@ -1,8 +1,6 @@
 $(document).ready(function() {
-    // Attach the form submission handler to the search form
-    $('#search-form').on('submit', handleFormSubmit);
-  
-    const history = new Set(); // Create a Set to keep track of unique cities
+    // Array to store the searched cities
+    var history = [];
   
     function fetchWeatherData(city) {
       var apikey = '1182b819fb971825022b5fab780f5857';
@@ -21,27 +19,35 @@ $(document).ready(function() {
       event.preventDefault();
   
       var city = $('#search-input').val();
-      fetchWeatherData(city);
   
-      createHistoryButton(city);
+      // Check if the city exists in the history array
+      if (!history.includes(city)) {
+        // Add the city to the history array
+        history.push(city);
   
-      // Optional: Reset the input value after submission
+        // Create a history button for the new city
+        createHistoryButton(city);
+      } else {
+        console.log('Skipping adding ' + city + ' to the history, since it is already present.');
+      }
+  
+      // Clear the input value after submission
       $('#search-input').val('');
     }
   
     function createHistoryButton(city) {
-      // Convert the city name to start with an uppercase letter
       var capitalizedCity = capitalizeFirstLetter(city);
   
-      if (!history.has(capitalizedCity)) { // Check if the city is already in the history
+      // Check if the city is in the history array
+      if (!history.includes(capitalizedCity)) {
+        // Create the button and add it to the history list
         var button = $('<button type="button"></button>');
         button.text(capitalizedCity);
         button.addClass('history-button');
+        button.data('city', capitalizedCity);
   
         var historyList = $('#history');
         historyList.append(button);
-  
-        history.add(capitalizedCity); // Add the city to the history
       }
     }
   
@@ -55,11 +61,16 @@ $(document).ready(function() {
     }
   
     var removeButton = $('<button class="remove-button btn"> Clear history </button>');
-    var InputGroup = $('.input-group-append');
-    InputGroup.append(removeButton);
+    var inputGroup = $('.input-group');
+    inputGroup.append(removeButton);
   
     removeButton.on('click', function() {
+      // Empties the history array
+      history = [];
+  
       // Remove all child elements with the class "history-button" from the "history" container
       $('#history').children('.history-button').remove();
     });
+  
+    var searchBar = $('#search-input');
   });
