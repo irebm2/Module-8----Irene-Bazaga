@@ -1,5 +1,7 @@
+
 $(document).ready(function() {
     let history = [];
+    
 
     function fetchWeatherData(city) {
         const apikey = '1182b819fb971825022b5fab780f5857';
@@ -50,8 +52,8 @@ $(document).ready(function() {
         displayWeatherData(data);
     }
 
-    const searchButton = $('<button type="submit" class="search-button btn">Search</button>');
-    const clearButton = $('<button class="clear-button btn">Clear History</button>');
+    const searchButton = $('<button type="submit" class="search-button btn btn-primary">Search</button>');
+    const clearButton = $('<button class="clear-button btn btn-danger">Clear History</button>');
 
     $('#search-form').append(searchButton, clearButton);
 
@@ -113,7 +115,7 @@ $(document).ready(function() {
         const currentWeatherIcon = currentWeather.weather[0].icon;
       
         const currentWeatherCardTitle = $(' <h2 class="cityName">' + currentCity + '</h2>')
-        const currentWeatherCard = $('<div class="weather-card"></div>');
+        const currentWeatherCard = $('<div class="weather-card current-weather"></div>');
         currentWeatherCard.html(`
        
           <h3>Current Weather</h3>
@@ -127,7 +129,7 @@ $(document).ready(function() {
         forecastContainer.append(currentWeatherCardTitle);
         forecastContainer.append(currentWeatherCard);
         
-        const forecastContainerTitle = $('<h3> Forecast for the next 5 days in ' + currentCity +'</h3>')
+        const forecastContainerTitle = $('<h2> Forecast for the next 5 days in ' + currentCity +'</h2>')
         forecastContainer.append(forecastContainerTitle);
         const forecastDays = data.list.filter(day => {
           const time = day.dt_txt.split(' ')[1];
@@ -142,9 +144,9 @@ $(document).ready(function() {
           const humidity = day.main.humidity;
           const weatherIcon = day.weather[0].icon;
       
-          const forecastCard = $('<div class="weather-card"></div>');
+          const forecastCard = $('<div class="weather-card five-day-weather-card"></div>');
           forecastCard.html(`
-            <h3>Forecast for ${date}</h3>
+            <h3> ${date}</h3>
             <img src="https://openweathermap.org/img/wn/${weatherIcon}.png" alt="${weatherDesc}">
             <p>Temperature: ${temperature}°C</p>
             <p>Weather: ${weatherDesc}</p>
@@ -154,7 +156,7 @@ $(document).ready(function() {
       
           forecastContainer.append(forecastCard);
         });
-        
+
         $('#history').on('click', '.history-button', function() { 
             // 'this' keyword refers to the current element that's clicked
             let city = $(this).data('city');
